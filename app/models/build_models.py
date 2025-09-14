@@ -1,5 +1,5 @@
 """
-Modelos de dominio para builds de Age of Empires
+Domain objects for AOE2 build strategies and guides.
 """
 
 from pydantic import BaseModel
@@ -8,7 +8,7 @@ from enum import Enum
 
 
 class BuildType(str, Enum):
-    """Tipos de builds disponibles"""
+    """Available build types"""
     FEUDAL_RUSH = "feudal_rush"
     FAST_CASTLE = "fast_castle"
     DARK_AGE_RUSH = "dark_age_rush"
@@ -16,14 +16,14 @@ class BuildType(str, Enum):
 
 
 class BuildDifficulty(str, Enum):
-    """Niveles de dificultad de los builds"""
+    """Level of difficulty for builds"""
     BEGINNER = "beginner"
     INTERMEDIATE = "intermediate"
     ADVANCED = "advanced"
 
 
 class BuildStep(BaseModel):
-    """Paso individual de un build"""
+    """Steps in a build order"""
     step_number: int
     age: str
     time: Optional[str] = None
@@ -33,7 +33,7 @@ class BuildStep(BaseModel):
 
 
 class Build(BaseModel):
-    """Modelo principal de un build"""
+    """Principal build order structure"""
     name: str
     difficulty: BuildDifficulty
     description: str
@@ -45,14 +45,14 @@ class Build(BaseModel):
 
 
 class BuildResponse(BaseModel):
-    """Respuesta de la API para builds"""
+    """API response for multiple builds"""
     builds: List[Build]
     total: int
     build_type: str
 
 
 class BuildGuide(BaseModel):
-    """Guía detallada de un tipo de build"""
+    """Guide for a specific build with alternatives"""
     build_type: str
     main_build: dict
     alternative_builds: List[dict]

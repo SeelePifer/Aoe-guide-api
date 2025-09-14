@@ -1,5 +1,5 @@
 """
-Controlador principal de la aplicación
+Principal controller that handles all application endpoints.
 """
 
 from fastapi import APIRouter
@@ -9,7 +9,7 @@ from app.repositories.build_repository import BuildRepository
 
 
 class AppController:
-    """Controlador principal que maneja todos los endpoints de la aplicación"""
+    """Principal controller that handles all application endpoints."""
     
     def __init__(self, build_service: BuildService):
         self.build_service = build_service
@@ -17,11 +17,11 @@ class AppController:
         self._setup_routes()
     
     def _setup_routes(self):
-        """Configura las rutas principales de la aplicación"""
+        """Configure the main application routes"""
         
         @self.router.get("/", response_model=dict)
         async def root():
-            """Endpoint raíz con información de la API"""
+            """Root endpoint with API information"""
             return {
                 "message": "AoE Build Guide API",
                 "version": "1.0.0",
@@ -38,10 +38,10 @@ class AppController:
         
         @self.router.post("/builds/refresh")
         async def refresh_builds():
-            """Refrescar la caché de builds desde la fuente"""
+            """Refresh the builds data by re-scraping the source website."""
             # Este endpoint se implementará en el servicio principal
             return {"message": "Builds actualizados correctamente"}
     
     def get_router(self):
-        """Retorna el router principal"""
+        """Return the configured router"""
         return self.router

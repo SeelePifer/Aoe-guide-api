@@ -2,7 +2,7 @@
 Models for pagination and performance filters
 """
 
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, validator, field_validator
 from typing import List, Optional, Any, Dict
 from math import ceil
 
@@ -12,13 +12,13 @@ class PaginationParams(BaseModel):
     page: int = Field(default=1, ge=1, description="Page number (starting from 1)")
     size: int = Field(default=10, ge=1, le=100, description="Page size (maximum 100)")
     
-    @validator('page')
+    @field_validator('page')
     def validate_page(cls, v):
         if v < 1:
             raise ValueError('Page must be greater than 0')
         return v
     
-    @validator('size')
+    @field_validator('size')
     def validate_size(cls, v):
         if v < 1:
             raise ValueError('Size must be greater than 0')
@@ -74,13 +74,13 @@ class FilterParams(BaseModel):
     sort_by: Optional[str] = Field(default="name", description="Campo para ordenar")
     sort_order: Optional[str] = Field(default="asc", description="Orden: asc o desc")
     
-    @validator('sort_order')
+    @field_validator('sort_order')
     def validate_sort_order(cls, v):
         if v not in ['asc', 'desc']:
             raise ValueError('Sort order must be "asc" or "desc"')
         return v
     
-    @validator('sort_by')
+    @field_validator('sort_by')
     def validate_sort_by(cls, v):
         allowed_fields = ['name', 'difficulty', 'build_type', 'feudal_age_time', 'castle_age_time']
         if v not in allowed_fields:
