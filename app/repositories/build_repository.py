@@ -1,5 +1,5 @@
 """
-Repositorio optimizado para acceso a datos de builds con cache y paginación
+Optimized repository for build data access with cache and pagination
 """
 
 import time
@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 
 
 class BuildRepositoryInterface(ABC):
-    """Interfaz para el repositorio de builds"""
+    """Interface for build repository"""
     
     @abstractmethod
     async def get_all_builds(self, pagination: Optional[PaginationParams] = None) -> Tuple[List[Build], int]:
@@ -38,7 +38,7 @@ class BuildRepositoryInterface(ABC):
 
 
 class OptimizedBuildRepository(BuildRepositoryInterface):
-    """Repositorio optimizado con cache y paginación"""
+    """Optimized repository with cache and pagination"""
     
     def __init__(self, builds_cache: List[Build]):
         self.builds_cache = builds_cache
@@ -46,30 +46,30 @@ class OptimizedBuildRepository(BuildRepositoryInterface):
         self._build_indexes()
     
     def _build_indexes(self):
-        """Construye índices para búsquedas más rápidas"""
+        """Build indexes for faster searches"""
         self._type_index = {}
         self._difficulty_index = {}
         self._name_index = {}
         
         for i, build in enumerate(self.builds_cache):
-            # Índice por tipo
+            # Index by type
             if build.build_type not in self._type_index:
                 self._type_index[build.build_type] = []
             self._type_index[build.build_type].append(i)
             
-            # Índice por dificultad
+            # Index by difficulty
             if build.difficulty not in self._difficulty_index:
                 self._difficulty_index[build.difficulty] = []
             self._difficulty_index[build.difficulty].append(i)
             
-            # Índice por nombre (para búsquedas)
+            # Index by name (for searches)
             self._name_index[build.name.lower()] = i
     
     async def get_all_builds(self, pagination: Optional[PaginationParams] = None) -> Tuple[List[Build], int]:
-        """Obtener todos los builds disponibles con paginación"""
+        """Get all available builds with pagination"""
         start_time = time.time()
         
-        # Intentar obtener del cache
+        # Try to get from cache
         cached_builds = self.cache.get_cached_builds()
         if cached_builds:
             logger.debug("Cache HIT: get_all_builds")
@@ -77,12 +77,12 @@ class OptimizedBuildRepository(BuildRepositoryInterface):
         else:
             logger.debug("Cache MISS: get_all_builds")
             builds = self.builds_cache
-            # Cachear para futuras consultas
+            # Cache for future queries
             self.cache.cache_builds(builds)
         
         total = len(builds)
         
-        # Aplicar paginación
+        # Apply pagination
         if pagination:
             start = pagination.offset
             end = start + pagination.size
@@ -94,29 +94,29 @@ class OptimizedBuildRepository(BuildRepositoryInterface):
         return builds, total
     
     async def get_builds_by_type(self, build_type: BuildType, pagination: Optional[PaginationParams] = None) -> Tuple[List[Build], int]:
-        """Obtener builds filtrados por tipo con paginación"""
+        """Get builds filtered by type with pagination"""
         start_time = time.time()
         
-        # Intentar obtener del cache
+        # Try to get from cache
         cached_builds = self.cache.get_cached_builds_by_type(build_type.value)
         if cached_builds:
             logger.debug(f"Cache HIT: get_builds_by_type({build_type.value})")
             builds = cached_builds
         else:
             logger.debug(f"Cache MISS: get_builds_by_type({build_type.value})")
-            # Usar índice para búsqueda más rápida
+            # Use index for faster search
             if build_type in self._type_index:
                 build_indices = self._type_index[build_type]
                 builds = [self.builds_cache[i] for i in build_indices]
             else:
                 builds = []
             
-            # Cachear resultado
+            # Cache result
             self.cache.cache_builds_by_type(build_type.value, builds)
         
         total = len(builds)
         
-        # Aplicar paginación
+        # Apply pagination
         if pagination:
             start = pagination.offset
             end = start + pagination.size
@@ -128,17 +128,17 @@ class OptimizedBuildRepository(BuildRepositoryInterface):
         return builds, total
     
     async def get_builds_by_difficulty(self, difficulty: str, pagination: Optional[PaginationParams] = None) -> Tuple[List[Build], int]:
-        """Obtener builds filtrados por dificultad con paginación"""
+        """Get builds filtered by difficulty with pagination"""
         start_time = time.time()
         
-        # Intentar obtener del cache
+        # Try to get from cache
         cached_builds = self.cache.get_cached_builds_by_difficulty(difficulty)
         if cached_builds:
             logger.debug(f"Cache HIT: get_builds_by_difficulty({difficulty})")
             builds = cached_builds
         else:
             logger.debug(f"Cache MISS: get_builds_by_difficulty({difficulty})")
-            # Usar índice para búsqueda más rápida
+            # Use index for faster search
             difficulty_enum = BuildDifficulty(difficulty)
             if difficulty_enum in self._difficulty_index:
                 build_indices = self._difficulty_index[difficulty_enum]
@@ -146,12 +146,12 @@ class OptimizedBuildRepository(BuildRepositoryInterface):
             else:
                 builds = []
             
-            # Cachear resultado
+            # Cache result
             self.cache.cache_builds_by_difficulty(difficulty, builds)
         
         total = len(builds)
         
-        # Aplicar paginación
+        # Apply pagination
         if pagination:
             start = pagination.offset
             end = start + pagination.size
@@ -163,10 +163,10 @@ class OptimizedBuildRepository(BuildRepositoryInterface):
         return builds, total
     
     async def search_builds(self, query: str, pagination: Optional[PaginationParams] = None) -> Tuple[List[Build], int]:
-        """Buscar builds por nombre o descripción con paginación"""
+        """Search builds by name or description with pagination"""
         start_time = time.time()
         
-        # Intentar obtener del cache
+        # Try to get from cache
         cached_builds = self.cache.get_cached_search_results(query)
         if cached_builds:
             logger.debug(f"Cache HIT: search_builds({query})")
@@ -176,18 +176,18 @@ class OptimizedBuildRepository(BuildRepositoryInterface):
             query_lower = query.lower()
             builds = []
             
-            # Búsqueda optimizada usando índices cuando sea posible
+            # Optimized search using indexes when possible
             for build in self.builds_cache:
                 if (query_lower in build.name.lower() or 
                     query_lower in build.description.lower()):
                     builds.append(build)
             
-            # Cachear resultado (TTL más corto para búsquedas)
+            # Cache result (shorter TTL for searches)
             self.cache.cache_search_results(query, builds, ttl=1800)
         
         total = len(builds)
         
-        # Aplicar paginación
+        # Apply pagination
         if pagination:
             start = pagination.offset
             end = start + pagination.size
@@ -199,30 +199,30 @@ class OptimizedBuildRepository(BuildRepositoryInterface):
         return builds, total
     
     async def get_filtered_builds(self, filters: FilterParams, pagination: Optional[PaginationParams] = None) -> Tuple[List[Build], int]:
-        """Obtener builds con filtros múltiples y paginación"""
+        """Get builds with multiple filters and pagination"""
         start_time = time.time()
         
-        # Aplicar filtros secuencialmente para optimizar
+        # Apply filters sequentially to optimize
         builds = self.builds_cache.copy()
         
-        # Filtro por tipo
+        # Filter by type
         if filters.build_type:
             build_type = BuildType(filters.build_type)
             builds = [b for b in builds if b.build_type == build_type]
         
-        # Filtro por dificultad
+        # Filter by difficulty
         if filters.difficulty:
             difficulty = BuildDifficulty(filters.difficulty)
             builds = [b for b in builds if b.difficulty == difficulty]
         
-        # Filtro por búsqueda
+        # Filter by search
         if filters.search:
             query_lower = filters.search.lower()
             builds = [b for b in builds if 
                      query_lower in b.name.lower() or 
                      query_lower in b.description.lower()]
         
-        # Ordenamiento
+        # Sorting
         if filters.sort_by:
             reverse = filters.sort_order == "desc"
             if filters.sort_by == "name":
@@ -238,7 +238,7 @@ class OptimizedBuildRepository(BuildRepositoryInterface):
         
         total = len(builds)
         
-        # Aplicar paginación
+        # Apply pagination
         if pagination:
             start = pagination.offset
             end = start + pagination.size
@@ -250,18 +250,18 @@ class OptimizedBuildRepository(BuildRepositoryInterface):
         return builds, total
     
     def update_cache(self, builds: List[Build]) -> None:
-        """Actualizar la caché de builds y limpiar cache"""
+        """Update builds cache and clear cache"""
         self.builds_cache = builds
         self._build_indexes()
         
-        # Limpiar cache existente
+        # Clear existing cache
         self.cache.invalidate_builds_cache()
         
-        # Cachear nueva lista
+        # Cache new list
         self.cache.cache_builds(builds)
         
         logger.info(f"Cache updated with {len(builds)} builds")
 
 
-# Alias para compatibilidad hacia atrás
+# Alias for backward compatibility
 BuildRepository = OptimizedBuildRepository

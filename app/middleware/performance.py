@@ -1,5 +1,5 @@
 """
-Middleware de rendimiento para optimizar respuestas
+Performance middleware to optimize responses
 """
 
 import time
@@ -14,47 +14,47 @@ logger = logging.getLogger(__name__)
 
 
 class PerformanceMiddleware(BaseHTTPMiddleware):
-    """Middleware para optimizar rendimiento"""
+    """Middleware to optimize performance"""
     
     def __init__(self, app, min_compress_size: int = 1000):
         super().__init__(app)
         self.min_compress_size = min_compress_size
     
     async def dispatch(self, request: Request, call_next: Callable) -> Response:
-        # Medir tiempo de respuesta
+        # Measure response time
         start_time = time.time()
         
-        # Procesar request
+        # Process request
         response = await call_next(request)
         
-        # Calcular tiempo de respuesta
+        # Calculate response time
         process_time = time.time() - start_time
         
-        # Agregar headers de rendimiento
+        # Add performance headers
         response.headers["X-Process-Time"] = str(round(process_time * 1000, 2))
-        response.headers["X-Cache-Status"] = "MISS"  # Se puede mejorar con cache headers
+        response.headers["X-Cache-Status"] = "MISS"  # Can be improved with cache headers
         
-        # Aplicar compresión si es necesario
+        # Apply compression if needed
         if self._should_compress(response):
             response = await self._compress_response(response)
         
-        # Log de rendimiento
+        # Performance log
         logger.info(f"{request.method} {request.url.path} - {response.status_code} - {process_time:.3f}s")
         
         return response
     
     def _should_compress(self, response: Response) -> bool:
-        """Determina si la respuesta debe ser comprimida"""
-        # Solo comprimir respuestas exitosas
+        """Determine if response should be compressed"""
+        # Only compress successful responses
         if response.status_code not in [200, 201]:
             return False
         
-        # Verificar content-type
+        # Check content-type
         content_type = response.headers.get("content-type", "")
         if not any(ct in content_type for ct in ["application/json", "text/", "application/xml"]):
             return False
         
-        # Verificar tamaño
+        # Check size
         content_length = response.headers.get("content-length")
         if content_length and int(content_length) < self.min_compress_size:
             return False
@@ -62,17 +62,17 @@ class PerformanceMiddleware(BaseHTTPMiddleware):
         return True
     
     async def _compress_response(self, response: Response) -> Response:
-        """Comprime la respuesta usando gzip"""
+        """Compress response using gzip"""
         try:
-            # Leer el contenido
+            # Read content
             body = b""
             async for chunk in response.body_iterator:
                 body += chunk
             
-            # Comprimir
+            # Compress
             compressed_body = gzip.compress(body)
             
-            # Crear nueva respuesta
+            # Create new response
             compressed_response = FastAPIResponse(
                 content=compressed_body,
                 status_code=response.status_code,
@@ -80,7 +80,7 @@ class PerformanceMiddleware(BaseHTTPMiddleware):
                 media_type=response.media_type
             )
             
-            # Agregar headers de compresión
+            # Add compression headers
             compressed_response.headers["Content-Encoding"] = "gzip"
             compressed_response.headers["Content-Length"] = str(len(compressed_body))
             
@@ -92,7 +92,7 @@ class PerformanceMiddleware(BaseHTTPMiddleware):
 
 
 class CacheHeadersMiddleware(BaseHTTPMiddleware):
-    """Middleware para agregar headers de cache"""
+    """Middleware to add cache headers"""
     
     def __init__(self, app, cache_ttl: int = 3600):
         super().__init__(app)
@@ -101,16 +101,16 @@ class CacheHeadersMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next: Callable) -> Response:
         response = await call_next(request)
         
-        # Solo agregar headers de cache para respuestas exitosas
+        # Only add cache headers for successful responses
         if response.status_code == 200:
-            # Cache público por defecto
+            # Public cache by default
             response.headers["Cache-Control"] = f"public, max-age={self.cache_ttl}"
             
-            # ETag basado en timestamp (se puede mejorar)
+            # ETag based on timestamp (can be improved)
             etag = f'"{int(time.time())}"'
             response.headers["ETag"] = etag
             
-            # Verificar If-None-Match
+            # Check If-None-Match
             if_none_match = request.headers.get("If-None-Match")
             if if_none_match == etag:
                 return Response(status_code=304)
@@ -119,7 +119,7 @@ class CacheHeadersMiddleware(BaseHTTPMiddleware):
 
 
 class RequestLoggingMiddleware(BaseHTTPMiddleware):
-    """Middleware para logging detallado de requests"""
+    """Middleware for detailed request logging"""
     
     def __init__(self, app, log_level: str = "INFO"):
         super().__init__(app)
@@ -128,16 +128,16 @@ class RequestLoggingMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next: Callable) -> Response:
         start_time = time.time()
         
-        # Log del request
+        # Log request
         logger.info(f"Request: {request.method} {request.url.path}")
         
-        # Procesar request
+        # Process request
         response = await call_next(request)
         
-        # Calcular tiempo
+        # Calculate time
         process_time = time.time() - start_time
         
-        # Log de la respuesta
+        # Log response
         logger.info(
             f"Response: {response.status_code} - "
             f"{process_time:.3f}s - "

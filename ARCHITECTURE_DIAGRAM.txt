@@ -106,3 +106,4 @@
 ✅ **Reutilización**: Servicios y repositorios reutilizables
 ✅ **Flexibilidad**: Fácil cambiar implementaciones
 
+

@@ -1,5 +1,5 @@
 """
-Sistema de cache persistente para mejorar rendimiento
+Persistent cache system for performance improvement
 """
 
 import sqlite3
@@ -15,14 +15,14 @@ logger = logging.getLogger(__name__)
 
 
 class CacheManager:
-    """Gestor de cache persistente con SQLite"""
+    """Persistent cache manager with SQLite"""
     
     def __init__(self, db_path: str = "cache.db"):
         self.db_path = db_path
         self._init_database()
     
     def _init_database(self):
-        """Inicializa la base de datos de cache"""
+        """Initialize cache database"""
         with sqlite3.connect(self.db_path) as conn:
             conn.execute("""
                 CREATE TABLE IF NOT EXISTS cache (
@@ -35,22 +35,22 @@ class CacheManager:
                 )
             """)
             
-            # Índices para mejorar rendimiento
+            # Indexes for performance improvement
             conn.execute("CREATE INDEX IF NOT EXISTS idx_expires_at ON cache(expires_at)")
             conn.execute("CREATE INDEX IF NOT EXISTS idx_last_accessed ON cache(last_accessed)")
     
     def _generate_key(self, prefix: str, *args) -> str:
-        """Genera una clave única para el cache"""
+        """Generate unique key for cache"""
         key_string = f"{prefix}:{':'.join(str(arg) for arg in args)}"
         return hashlib.md5(key_string.encode()).hexdigest()
     
     def set(self, key: str, value: Any, ttl_seconds: int = 3600) -> bool:
-        """Almacena un valor en el cache con TTL"""
+        """Store value in cache with TTL"""
         try:
-            # Serializar el valor
+            # Serialize value
             serialized_value = pickle.dumps(value)
             
-            # Calcular expiración
+            # Calculate expiration
             expires_at = datetime.now() + timedelta(seconds=ttl_seconds)
             
             with sqlite3.connect(self.db_path) as conn:
@@ -67,7 +67,7 @@ class CacheManager:
             return False
     
     def get(self, key: str) -> Optional[Any]:
-        """Recupera un valor del cache"""
+        """Retrieve value from cache"""
         try:
             with sqlite3.connect(self.db_path) as conn:
                 cursor = conn.execute("""
@@ -79,7 +79,7 @@ class CacheManager:
                 if row:
                     value, expires_at = row
                     
-                    # Actualizar estadísticas de acceso
+                    # Update access statistics
                     conn.execute("""
                         UPDATE cache 
                         SET access_count = access_count + 1, 
@@ -98,7 +98,7 @@ class CacheManager:
             return None
     
     def delete(self, key: str) -> bool:
-        """Elimina una entrada del cache"""
+        """Delete cache entry"""
         try:
             with sqlite3.connect(self.db_path) as conn:
                 cursor = conn.execute("DELETE FROM cache WHERE key = ?", (key,))
@@ -113,7 +113,7 @@ class CacheManager:
             return False
     
     def clear_expired(self) -> int:
-        """Limpia entradas expiradas del cache"""
+        """Clear expired cache entries"""
         try:
             with sqlite3.connect(self.db_path) as conn:
                 cursor = conn.execute("""
@@ -130,7 +130,7 @@ class CacheManager:
             return 0
     
     def get_stats(self) -> Dict[str, Any]:
-        """Obtiene estadísticas del cache"""
+        """Get cache statistics"""
         try:
             with sqlite3.connect(self.db_path) as conn:
                 cursor = conn.execute("""
@@ -156,7 +156,7 @@ class CacheManager:
 
 
 class BuildCache:
-    """Cache específico para builds con métodos optimizados"""
+    """Build-specific cache with optimized methods"""
     
     def __init__(self, cache_manager: CacheManager):
         self.cache = cache_manager
@@ -166,45 +166,45 @@ class BuildCache:
         self.search_key = "builds:search"
     
     def cache_builds(self, builds: List[Any], ttl: int = 3600) -> bool:
-        """Cachea la lista completa de builds"""
+        """Cache complete builds list"""
         return self.cache.set(self.builds_key, builds, ttl)
     
     def get_cached_builds(self) -> Optional[List[Any]]:
-        """Recupera builds del cache"""
+        """Retrieve builds from cache"""
         return self.cache.get(self.builds_key)
     
     def cache_builds_by_type(self, build_type: str, builds: List[Any], ttl: int = 3600) -> bool:
-        """Cachea builds filtrados por tipo"""
+        """Cache builds filtered by type"""
         key = f"{self.builds_by_type_key}:{build_type}"
         return self.cache.set(key, builds, ttl)
     
     def get_cached_builds_by_type(self, build_type: str) -> Optional[List[Any]]:
-        """Recupera builds por tipo del cache"""
+        """Retrieve builds by type from cache"""
         key = f"{self.builds_by_type_key}:{build_type}"
         return self.cache.get(key)
     
     def cache_builds_by_difficulty(self, difficulty: str, builds: List[Any], ttl: int = 3600) -> bool:
-        """Cachea builds filtrados por dificultad"""
+        """Cache builds filtered by difficulty"""
         key = f"{self.builds_by_difficulty_key}:{difficulty}"
         return self.cache.set(key, builds, ttl)
     
     def get_cached_builds_by_difficulty(self, difficulty: str) -> Optional[List[Any]]:
-        """Recupera builds por dificultad del cache"""
+        """Retrieve builds by difficulty from cache"""
         key = f"{self.builds_by_difficulty_key}:{difficulty}"
         return self.cache.get(key)
     
     def cache_search_results(self, query: str, builds: List[Any], ttl: int = 1800) -> bool:
-        """Cachea resultados de búsqueda"""
+        """Cache search results"""
         key = f"{self.search_key}:{hashlib.md5(query.encode()).hexdigest()}"
         return self.cache.set(key, builds, ttl)
     
     def get_cached_search_results(self, query: str) -> Optional[List[Any]]:
-        """Recupera resultados de búsqueda del cache"""
+        """Retrieve search results from cache"""
         key = f"{self.search_key}:{hashlib.md5(query.encode()).hexdigest()}"
         return self.cache.get(key)
     
     def invalidate_builds_cache(self) -> bool:
-        """Invalida todo el cache de builds"""
+        """Invalidate all builds cache"""
         keys_to_delete = [
             self.builds_key,
             f"{self.builds_by_type_key}:*",
@@ -215,13 +215,13 @@ class BuildCache:
         success = True
         for key_pattern in keys_to_delete:
             if "*" in key_pattern:
-                # Para patrones con wildcard, necesitaríamos una implementación más compleja
+                # For wildcard patterns, we would need a more complex implementation
                 continue
             success &= self.cache.delete(key_pattern)
         
         return success
 
 
-# Instancia global del cache
+# Global cache instance
 cache_manager = CacheManager()
 build_cache = BuildCache(cache_manager)

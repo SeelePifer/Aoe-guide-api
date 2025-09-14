@@ -1,5 +1,5 @@
 """
-Servicio optimizado para scraping asíncrono de datos de builds desde AoE Companion
+Optimized service for asynchronous scraping of build data from AoE Companion
 """
 
 import aiohttp
@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 
 class OptimizedScrapingService:
-    """Servicio optimizado para extraer builds desde AoE Companion"""
+    """Optimized service to extract builds from AoE Companion"""
     
     def __init__(self, max_concurrent_requests: int = 5, timeout: int = 30):
         self.base_url = "https://aoecompanion.com/build-guides"
@@ -27,7 +27,7 @@ class OptimizedScrapingService:
         self.semaphore = asyncio.Semaphore(max_concurrent_requests)
     
     async def scrape_builds(self) -> List[Build]:
-        """Extrae los builds desde AoE Companion de forma asíncrona"""
+        """Extract builds from AoE Companion asynchronously"""
         start_time = time.time()
         
         try:
@@ -36,10 +36,10 @@ class OptimizedScrapingService:
                 timeout=aiohttp.ClientTimeout(total=self.timeout)
             ) as session:
                 
-                # Obtener la página principal
+                # Get main page
                 builds = await self._scrape_main_page(session)
                 
-                # Procesar builds en paralelo
+                # Process builds in parallel
                 if builds:
                     builds = await self._process_builds_parallel(session, builds)
                 
@@ -53,7 +53,7 @@ class OptimizedScrapingService:
             return []
     
     async def _scrape_main_page(self, session: aiohttp.ClientSession) -> List[Build]:
-        """Extrae builds de la página principal"""
+        """Extract builds from main page"""
         try:
             async with session.get(self.base_url) as response:
                 if response.status != 200:
@@ -64,7 +64,7 @@ class OptimizedScrapingService:
                 soup = BeautifulSoup(html, 'html.parser')
                 builds = []
                 
-                # Buscar las secciones de builds
+                # Find build sections
                 sections = soup.find_all('div', class_=re.compile(r'.*section.*|.*build.*'))
                 
                 for section in sections:
@@ -81,10 +81,10 @@ class OptimizedScrapingService:
             return []
     
     async def _extract_builds_from_section(self, section) -> List[Build]:
-        """Extrae builds de una sección específica"""
+        """Extract builds from specific section"""
         builds = []
         
-        # Buscar el título de la sección para determinar el tipo
+        # Find section title to determine type
         section_title = section.find(['h2', 'h3', 'h4'])
         if not section_title:
             return builds
@@ -95,7 +95,7 @@ class OptimizedScrapingService:
         if not build_type:
             return builds
         
-        # Buscar builds dentro de la sección
+        # Find builds within section
         build_items = section.find_all(['div', 'article'], class_=re.compile(r'.*build.*|.*card.*|.*item.*'))
         
         for item in build_items:
@@ -106,14 +106,14 @@ class OptimizedScrapingService:
         return builds
     
     async def _process_builds_parallel(self, session: aiohttp.ClientSession, builds: List[Build]) -> List[Build]:
-        """Procesa builds en paralelo para obtener detalles adicionales"""
+        """Process builds in parallel to get additional details"""
         tasks = []
         
         for build in builds:
             task = self._enhance_build_data(session, build)
             tasks.append(task)
         
-        # Procesar en lotes para evitar sobrecargar el servidor
+        # Process in batches to avoid overloading server
         enhanced_builds = []
         for i in range(0, len(tasks), self.max_concurrent_requests):
             batch = tasks[i:i + self.max_concurrent_requests]
@@ -128,19 +128,19 @@ class OptimizedScrapingService:
         return enhanced_builds
     
     async def _enhance_build_data(self, session: aiohttp.ClientSession, build: Build) -> Build:
-        """Mejora los datos de un build con información adicional"""
-        async with self.semaphore:  # Limitar concurrencia
+        """Enhance build data with additional information"""
+        async with self.semaphore:  # Limit concurrency
             try:
-                # Aquí podrías hacer requests adicionales para obtener más detalles
-                # Por ahora, solo devolvemos el build original
-                await asyncio.sleep(0.1)  # Simular procesamiento
+                # Here you could make additional requests to get more details
+                # For now, just return the original build
+                await asyncio.sleep(0.1)  # Simulate processing
                 return build
             except Exception as e:
                 logger.warning(f"Error enhancing build {build.name}: {e}")
                 return build
     
     def _determine_build_type(self, title_text: str) -> Optional[BuildType]:
-        """Determina el tipo de build basado en el título de la sección"""
+        """Determine build type based on section title"""
         if 'feudal rush' in title_text:
             return BuildType.FEUDAL_RUSH
         elif 'fast castle' in title_text:
@@ -152,22 +152,22 @@ class OptimizedScrapingService:
         return None
     
     def _extract_build_from_item(self, item, build_type: BuildType) -> Optional[Build]:
-        """Extrae información de un build desde un elemento HTML"""
-        # Extraer nombre del build
+        """Extract build information from HTML element"""
+        # Extract build name
         name_elem = item.find(['h3', 'h4', 'h5', 'strong', 'b'])
         if not name_elem:
             return None
             
         name = name_elem.get_text().strip()
         
-        # Extraer descripción
+        # Extract description
         desc_elem = item.find('p') or item.find('div', class_=re.compile(r'.*desc.*'))
         description = desc_elem.get_text().strip() if desc_elem else ""
         
-        # Determinar dificultad
+        # Determine difficulty
         difficulty = self._determine_difficulty(description, name)
         
-        # Extraer tiempos de edad
+        # Extract age times
         feudal_time, castle_time, imperial_time = self._extract_age_times(description)
         
         return Build(
@@ -181,7 +181,7 @@ class OptimizedScrapingService:
         )
     
     def _determine_difficulty(self, description: str, name: str) -> BuildDifficulty:
-        """Determina la dificultad del build"""
+        """Determine build difficulty"""
         text_lower = (description + " " + name).lower()
         
         if 'beginner' in text_lower:
@@ -192,12 +192,12 @@ class OptimizedScrapingService:
             return BuildDifficulty.INTERMEDIATE
     
     def _extract_age_times(self, description: str) -> tuple:
-        """Extrae los tiempos de las diferentes edades"""
+        """Extract times for different ages"""
         feudal_time = None
         castle_time = None
         imperial_time = None
         
-        # Buscar patrones de tiempo
+        # Search for time patterns
         feudal_patterns = re.findall(r'Feudal Age (\d+)', description)
         if feudal_patterns:
             feudal_time = int(feudal_patterns[0])
@@ -213,5 +213,5 @@ class OptimizedScrapingService:
         return feudal_time, castle_time, imperial_time
 
 
-# Alias para compatibilidad hacia atrás
+# Alias for backward compatibility
 ScrapingService = OptimizedScrapingService
