@@ -1,5 +1,5 @@
 """
-Servicio optimizado de lógica de negocio para builds
+Optimized business logic service for builds
 """
 
 import time
@@ -13,13 +13,13 @@ logger = logging.getLogger(__name__)
 
 
 class OptimizedBuildService:
-    """Servicio optimizado para la gestión de builds"""
+    """Optimized service for build management"""
     
     def __init__(self, build_repository: BuildRepository):
         self.build_repository = build_repository
     
     async def get_all_builds(self, pagination: Optional[PaginationParams] = None) -> Tuple[List[Build], int]:
-        """Obtener todos los builds disponibles con paginación"""
+        """Get all available builds with pagination"""
         start_time = time.time()
         
         builds, total = await self.build_repository.get_all_builds(pagination)
@@ -30,12 +30,12 @@ class OptimizedBuildService:
         return builds, total
     
     async def get_builds_by_type(self, build_type: BuildType, pagination: Optional[PaginationParams] = None) -> Tuple[List[Build], int]:
-        """Obtener builds filtrados por tipo con paginación"""
+        """Get builds filtered by type with pagination"""
         start_time = time.time()
         
         builds, total = await self.build_repository.get_builds_by_type(build_type, pagination)
         
-        # Asegurar que todos los builds tengan pasos detallados
+        # Ensure all builds have detailed steps
         for build in builds:
             if not build.steps:
                 build.steps = self._get_build_steps(build.name, build.build_type)
@@ -46,7 +46,7 @@ class OptimizedBuildService:
         return builds, total
     
     async def get_builds_by_difficulty(self, difficulty: str, pagination: Optional[PaginationParams] = None) -> Tuple[List[Build], int]:
-        """Obtener builds filtrados por dificultad con paginación"""
+        """Get builds filtered by difficulty with pagination"""
         start_time = time.time()
         
         builds, total = await self.build_repository.get_builds_by_difficulty(difficulty, pagination)

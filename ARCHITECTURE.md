@@ -1,143 +1,143 @@
-# Arquitectura en Capas - AoE Build Guide API (Optimizada)
+# Layered Architecture - AoE Build Guide API (Optimized)
 
-## 📁 Estructura del Proyecto
+## 📁 Project Structure
 
 ```
 Aoe-guide-api/
-├── app/                          # Paquete principal de la aplicación
+├── app/                          # Main application package
 │   ├── __init__.py
-│   ├── models/                   # Capa de Dominio
+│   ├── models/                   # Domain Layer
 │   │   ├── __init__.py
-│   │   ├── build_models.py       # Modelos de datos (Build, BuildStep, etc.)
-│   │   └── pagination_models.py  # Modelos de paginación y filtros
-│   ├── services/                 # Capa de Servicios
+│   │   ├── build_models.py       # Data models (Build, BuildStep, etc.)
+│   │   └── pagination_models.py  # Pagination and filter models
+│   ├── services/                 # Services Layer
 │   │   ├── __init__.py
-│   │   ├── build_service.py      # Lógica de negocio optimizada
-│   │   └── scraping_service.py   # Scraping asíncrono
-│   ├── repositories/             # Capa de Repositorio
+│   │   ├── build_service.py      # Optimized business logic
+│   │   └── scraping_service.py   # Asynchronous scraping
+│   ├── repositories/             # Repository Layer
 │   │   ├── __init__.py
-│   │   └── build_repository.py   # Repositorio con cache y paginación
-│   ├── controllers/              # Capa de Controladores
+│   │   └── build_repository.py   # Repository with cache and pagination
+│   ├── controllers/              # Controllers Layer
 │   │   ├── __init__.py
-│   │   ├── build_controller.py   # Endpoints de builds
-│   │   └── app_controller.py     # Controlador principal
-│   ├── config/                   # Capa de Configuración
+│   │   ├── build_controller.py   # Build endpoints
+│   │   └── app_controller.py     # Main controller
+│   ├── config/                   # Configuration Layer
 │   │   ├── __init__.py
-│   │   ├── settings.py           # Configuración de la aplicación
-│   │   ├── database.py           # Configuración de BD/caché
-│   │   ├── dependencies.py       # Inyección de dependencias
-│   │   └── cache.py              # Sistema de cache persistente
-│   ├── middleware/               # Capa de Middleware
+│   │   ├── settings.py           # Application configuration
+│   │   ├── database.py           # Database/cache configuration
+│   │   ├── dependencies.py       # Dependency injection
+│   │   └── cache.py              # Persistent cache system
+│   ├── middleware/               # Middleware Layer
 │   │   ├── __init__.py
-│   │   └── performance.py        # Middleware de rendimiento
-│   └── utils/                    # Utilidades
+│   │   └── performance.py        # Performance middleware
+│   └── utils/                    # Utilities
 │       ├── __init__.py
-│       └── helpers.py            # Funciones auxiliares
-├── main.py                       # Archivo original (legacy)
-├── main_refactored.py            # Archivo principal refactorizado
-├── main_optimized.py             # API optimizada con mejoras de rendimiento
-├── test_api.py                   # Script de pruebas original
-├── test_refactored_api.py        # Tests de API refactorizada
-├── test_integration.py           # Tests de integración
-├── test_units.py                 # Tests unitarios
-├── test_performance.py           # Tests de rendimiento
-├── run_tests.py                  # Script maestro de testing
-├── requirements.txt              # Dependencias
-├── ARCHITECTURE.md               # Documentación de arquitectura
-├── TESTING.md                    # Guía de testing
-├── PERFORMANCE_IMPROVEMENTS.md   # Documentación de mejoras de rendimiento
-└── cache.db                      # Base de datos de cache (SQLite)
+│       └── helpers.py            # Helper functions
+├── main.py                       # Original file (legacy)
+├── main_refactored.py            # Refactored main file
+├── main_optimized.py             # API optimized with performance improvements
+├── test_api.py                   # Original test script
+├── test_refactored_api.py        # Refactored API tests
+├── test_integration.py           # Integration tests
+├── test_units.py                 # Unit tests
+├── test_performance.py           # Performance tests
+├── run_tests.py                  # Master testing script
+├── requirements.txt              # Dependencies
+├── ARCHITECTURE.md               # Architecture documentation
+├── TESTING.md                    # Testing guide
+├── PERFORMANCE_IMPROVEMENTS.md   # Performance improvements documentation
+└── cache.db                      # Cache database (SQLite)
 ```
 
-## 🏗️ Arquitectura en Capas (Optimizada)
+## 🏗️ Layered Architecture (Optimized)
 
-### 1. **Capa de Dominio (Models)**
+### 1. **Domain Layer (Models)**
 
-- **Propósito**: Define las entidades y reglas de negocio
-- **Archivos**:
-  - `app/models/build_models.py`: Modelos principales
-  - `app/models/pagination_models.py`: Modelos de paginación y filtros
-- **Contenido**:
-  - `Build`: Entidad principal
-  - `BuildStep`: Pasos de un build
+- **Purpose**: Defines entities and business rules
+- **Files**:
+  - `app/models/build_models.py`: Main models
+  - `app/models/pagination_models.py`: Pagination and filter models
+- **Content**:
+  - `Build`: Main entity
+  - `BuildStep`: Build steps
   - `BuildType`, `BuildDifficulty`: Enums
   - `BuildResponse`, `BuildGuide`: DTOs
-  - `PaginationParams`: Parámetros de paginación
-  - `FilterParams`: Parámetros de filtrado
-  - `PaginatedResponse`: Respuesta paginada
-  - `PerformanceMetrics`: Métricas de rendimiento
+  - `PaginationParams`: Pagination parameters
+  - `FilterParams`: Filter parameters
+  - `PaginatedResponse`: Paginated response
+  - `PerformanceMetrics`: Performance metrics
 
-### 2. **Capa de Repositorio (Repositories)**
+### 2. **Repository Layer (Repositories)**
 
-- **Propósito**: Abstrae el acceso a datos con optimizaciones
-- **Archivos**: `app/repositories/build_repository.py`
-- **Contenido**:
-  - `BuildRepositoryInterface`: Interfaz
-  - `OptimizedBuildRepository`: Implementación optimizada
-- **Características**:
-  - **Cache persistente** con SQLite
-  - **Índices en memoria** para búsquedas O(1)
-  - **Paginación nativa** en todos los métodos
-  - **Filtros combinables** con ordenamiento
-  - **Métricas de rendimiento** integradas
+- **Purpose**: Abstracts data access with optimizations
+- **Files**: `app/repositories/build_repository.py`
+- **Content**:
+  - `BuildRepositoryInterface`: Interface
+  - `OptimizedBuildRepository`: Optimized implementation
+- **Features**:
+  - **Persistent cache** with SQLite
+  - **In-memory indexes** for O(1) searches
+  - **Native pagination** in all methods
+  - **Combinable filters** with sorting
+  - **Integrated performance metrics**
 
-### 3. **Capa de Servicios (Services)**
+### 3. **Services Layer (Services)**
 
-- **Propósito**: Contiene la lógica de negocio optimizada
-- **Archivos**:
-  - `app/services/build_service.py`: Lógica de builds optimizada
-  - `app/services/scraping_service.py`: Scraping asíncrono
-- **Características**:
-  - **Scraping asíncrono** con aiohttp
-  - **Procesamiento paralelo** controlado
-  - **Rate limiting** para no sobrecargar servidor
-  - **Paginación** en todos los métodos
-  - **Métricas de rendimiento** detalladas
+- **Purpose**: Contains optimized business logic
+- **Files**:
+  - `app/services/build_service.py`: Optimized build logic
+  - `app/services/scraping_service.py`: Asynchronous scraping
+- **Features**:
+  - **Asynchronous scraping** with aiohttp
+  - **Controlled parallel processing**
+  - **Rate limiting** to avoid overloading server
+  - **Pagination** in all methods
+  - **Detailed performance metrics**
 
-### 4. **Capa de Controladores (Controllers)**
+### 4. **Controllers Layer (Controllers)**
 
-- **Propósito**: Maneja las peticiones HTTP con optimizaciones
-- **Archivos**:
-  - `app/controllers/build_controller.py`: Endpoints de builds
-  - `app/controllers/app_controller.py`: Endpoints generales
-- **Características**:
-  - **Dependency injection** para servicios
-  - **Validación automática** de parámetros
-  - **Respuestas paginadas** por defecto
-  - **Headers de rendimiento** automáticos
+- **Purpose**: Handles HTTP requests with optimizations
+- **Files**:
+  - `app/controllers/build_controller.py`: Build endpoints
+  - `app/controllers/app_controller.py`: General endpoints
+- **Features**:
+  - **Dependency injection** for services
+  - **Automatic parameter validation**
+  - **Paginated responses** by default
+  - **Automatic performance headers**
 
-### 5. **Capa de Configuración (Config)**
+### 5. **Configuration Layer (Config)**
 
-- **Propósito**: Configuración y dependencias optimizadas
-- **Archivos**:
-  - `app/config/settings.py`: Configuración de la app
-  - `app/config/database.py`: Configuración de datos
-  - `app/config/dependencies.py`: Inyección de dependencias
-  - `app/config/cache.py`: Sistema de cache persistente
-- **Características**:
-  - **Cache SQLite** con TTL configurable
-  - **Estadísticas de cache** en tiempo real
-  - **Configuración por ambiente**
-  - **Métricas de rendimiento**
+- **Purpose**: Configuration and optimized dependencies
+- **Files**:
+  - `app/config/settings.py`: App configuration
+  - `app/config/database.py`: Data configuration
+  - `app/config/dependencies.py`: Dependency injection
+  - `app/config/cache.py`: Persistent cache system
+- **Features**:
+  - **SQLite cache** with configurable TTL
+  - **Real-time cache statistics**
+  - **Environment-based configuration**
+  - **Performance metrics**
 
-### 6. **Capa de Middleware (Middleware)**
+### 6. **Middleware Layer (Middleware)**
 
-- **Propósito**: Middleware de rendimiento y optimización
-- **Archivos**: `app/middleware/performance.py`
-- **Contenido**:
-  - `PerformanceMiddleware`: Métricas de rendimiento
-  - `CacheHeadersMiddleware`: Headers de cache
-  - `RequestLoggingMiddleware`: Logging estructurado
-- **Características**:
-  - **Compresión gzip** automática
-  - **Headers de cache** optimizados
-  - **Métricas en tiempo real**
-  - **Logging estructurado**
+- **Purpose**: Performance and optimization middleware
+- **Files**: `app/middleware/performance.py`
+- **Content**:
+  - `PerformanceMiddleware`: Performance metrics
+  - `CacheHeadersMiddleware`: Cache headers
+  - `RequestLoggingMiddleware`: Structured logging
+- **Features**:
+  - **Automatic gzip compression**
+  - **Optimized cache headers**
+  - **Real-time metrics**
+  - **Structured logging**
 
-### 7. **Capa de Utilidades (Utils)**
+### 7. **Utilities Layer (Utils)**
 
-- **Propósito**: Funciones auxiliares
-- **Archivos**: `app/utils/helpers.py`
+- **Purpose**: Helper functions
+- **Files**: `app/utils/helpers.py`
 
 ## 🔄 Flujo de Datos Optimizado
 

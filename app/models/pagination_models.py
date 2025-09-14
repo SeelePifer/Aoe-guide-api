@@ -1,5 +1,5 @@
 """
-Modelos para paginación y filtros de rendimiento
+Models for pagination and performance filters
 """
 
 from pydantic import BaseModel, Field, validator
@@ -8,9 +8,9 @@ from math import ceil
 
 
 class PaginationParams(BaseModel):
-    """Parámetros de paginación"""
-    page: int = Field(default=1, ge=1, description="Número de página (empezando en 1)")
-    size: int = Field(default=10, ge=1, le=100, description="Tamaño de página (máximo 100)")
+    """Pagination parameters"""
+    page: int = Field(default=1, ge=1, description="Page number (starting from 1)")
+    size: int = Field(default=10, ge=1, le=100, description="Page size (maximum 100)")
     
     @validator('page')
     def validate_page(cls, v):

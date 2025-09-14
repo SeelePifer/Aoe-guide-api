@@ -1,82 +1,82 @@
-# 🧪 Guía de Testing - AoE Build Guide API
+# 🧪 Testing Guide - AoE Build Guide API
 
-## 📋 Tipos de Tests Disponibles
+## 📋 Available Test Types
 
-### 1. **Tests Unitarios** (`test_units.py`)
+### 1. **Unit Tests** (`test_units.py`)
 
-- **Propósito**: Probar cada capa individualmente
-- **Cobertura**: Models, Services, Repositories, Scraping
-- **Requisitos**: No requiere API ejecutándose
-- **Ejecución**: `python test_units.py`
+- **Purpose**: Test each layer individually
+- **Coverage**: Models, Services, Repositories, Scraping
+- **Requirements**: No API running required
+- **Execution**: `python test_units.py`
 
-### 2. **Tests de Integración** (`test_integration.py`)
+### 2. **Integration Tests** (`test_integration.py`)
 
-- **Propósito**: Probar la integración entre capas
-- **Cobertura**: Dependency Injection, Data Flow, Service Integration
-- **Requisitos**: No requiere API ejecutándose
-- **Ejecución**: `python test_integration.py`
+- **Purpose**: Test integration between layers
+- **Coverage**: Dependency Injection, Data Flow, Service Integration
+- **Requirements**: No API running required
+- **Execution**: `python test_integration.py`
 
-### 3. **Tests de API** (`test_refactored_api.py`)
+### 3. **API Tests** (`test_refactored_api.py`)
 
-- **Propósito**: Probar endpoints HTTP de la API refactorizada
-- **Cobertura**: Todos los endpoints, respuestas, validaciones
-- **Requisitos**: API refactorizada ejecutándose en puerto 8000
-- **Ejecución**: `python test_refactored_api.py`
+- **Purpose**: Test HTTP endpoints of the refactored API
+- **Coverage**: All endpoints, responses, validations
+- **Requirements**: Refactored API running on port 8000
+- **Execution**: `python test_refactored_api.py`
 
-### 4. **Tests de API Original** (`test_api.py`)
+### 4. **Original API Tests** (`test_api.py`)
 
-- **Propósito**: Probar endpoints HTTP de la API original
-- **Cobertura**: Funcionalidad básica de la API original
-- **Requisitos**: API original ejecutándose en puerto 8000
-- **Ejecución**: `python test_api.py`
+- **Purpose**: Test HTTP endpoints of the original API
+- **Coverage**: Basic functionality of the original API
+- **Requirements**: Original API running on port 8000
+- **Execution**: `python test_api.py`
 
-## 🚀 Formas de Ejecutar los Tests
+## 🚀 Ways to Run Tests
 
-### **Opción 1: Script Maestro (Recomendado)**
+### **Option 1: Master Script (Recommended)**
 
 ```bash
-# Ejecutar todos los tests
+# Run all tests
 python run_tests.py
 
-# Ejecutar con tests de API original
+# Run with original API tests
 python run_tests.py --original
 
-# Solo tests unitarios
+# Unit tests only
 python run_tests.py --unit-only
 
-# Solo tests de integración
+# Integration tests only
 python run_tests.py --integration-only
 
-# Solo tests de API
+# API tests only
 python run_tests.py --api-only
 ```
 
-### **Opción 2: Tests Individuales**
+### **Option 2: Individual Tests**
 
 ```bash
-# Tests unitarios
+# Unit tests
 python test_units.py
 
-# Tests de integración
+# Integration tests
 python test_integration.py
 
-# Tests de API (requiere API ejecutándose)
+# API tests (requires API running)
 python test_refactored_api.py
 
-# Tests de API original (requiere API original ejecutándose)
+# Original API tests (requires original API running)
 python test_api.py
 ```
 
-### **Opción 3: Tests Manuales con API**
+### **Option 3: Manual Tests with API**
 
 ```bash
-# 1. Iniciar API refactorizada
+# 1. Start refactored API
 python main_refactored.py
 
-# 2. En otra terminal, ejecutar tests
+# 2. In another terminal, run tests
 python test_refactored_api.py
 
-# 3. Detener API (Ctrl+C)
+# 3. Stop API (Ctrl+C)
 ```
 
 ## 📊 Interpretación de Resultados

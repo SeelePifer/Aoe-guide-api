@@ -1,5 +1,5 @@
 """
-API optimizada con mejoras de rendimiento
+Optimized API with performance improvements
 """
 
 import asyncio
@@ -16,7 +16,7 @@ from app.services.scraping_service import OptimizedScrapingService
 from app.middleware.performance import PerformanceMiddleware, CacheHeadersMiddleware, RequestLoggingMiddleware
 from app.config.cache import cache_manager
 
-# Configurar logging
+# Configure logging
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
@@ -25,16 +25,16 @@ logger = logging.getLogger(__name__)
 
 
 def create_optimized_app() -> FastAPI:
-    """Crea y configura la aplicación FastAPI optimizada"""
+    """Creates and configures the optimized FastAPI application"""
     
-    # Crear aplicación FastAPI
+    # Create FastAPI application
     app = FastAPI(
         title=f"{settings.app_name} - Optimized",
-        description=f"{settings.app_description} - Versión optimizada con mejoras de rendimiento",
+        description=f"{settings.app_description} - Optimized version with performance improvements",
         version="2.0.0"
     )
     
-    # Configurar CORS
+    # Configure CORS
     app.add_middleware(
         CORSMiddleware,
         allow_origins=settings.cors_origins,
@@ -43,49 +43,49 @@ def create_optimized_app() -> FastAPI:
         allow_headers=settings.cors_allow_headers,
     )
     
-    # Agregar middleware de rendimiento
+    # Add performance middleware
     app.add_middleware(PerformanceMiddleware)
     app.add_middleware(CacheHeadersMiddleware)
     app.add_middleware(RequestLoggingMiddleware)
     
-    # Agregar compresión
+    # Add compression
     app.add_middleware(GZipMiddleware, minimum_size=1000)
     
     return app
 
 
-# Crear aplicación
+# Create application
 app = create_optimized_app()
 
-# Variables globales para los servicios
+# Global variables for services
 build_service = None
 build_repository = None
 
 
 @app.on_event("startup")
 async def startup_event():
-    """Evento de inicio de la aplicación"""
+    """Application startup event"""
     global build_service, build_repository
     
-    logger.info("🚀 Inicializando servicios optimizados...")
+    logger.info("🚀 Initializing optimized services...")
     
-    # Inicializar scraping service asíncrono
+    # Initialize asynchronous scraping service
     scraping_service = OptimizedScrapingService()
     builds_cache = await scraping_service.scrape_builds()
     
-    # Inicializar repositorio optimizado
+    # Initialize optimized repository
     build_repository = OptimizedBuildRepository(builds_cache)
     
-    # Inicializar servicio optimizado
+    # Initialize optimized service
     build_service = OptimizedBuildService(build_repository)
     
-    # Limpiar cache expirado
+    # Clear expired cache
     cache_manager.clear_expired()
     
-    logger.info(f"✅ Servicios optimizados inicializados. {len(builds_cache)} builds cargados.")
+    logger.info(f"✅ Optimized services initialized. {len(builds_cache)} builds loaded.")
 
 
-# Dependency para obtener el servicio
+# Dependency to get the service
 def get_build_service() -> OptimizedBuildService:
     if build_service is None:
         raise HTTPException(status_code=503, detail="Servicio no inicializado")

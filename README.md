@@ -1,123 +1,123 @@
 # AoE Build Guide API
 
-Una API REST construida con FastAPI que consume información de builds de Age of Empires desde [AoE Companion](https://aoecompanion.com/build-guides).
+A REST API built with FastAPI that consumes Age of Empires build information from [AoE Companion](https://aoecompanion.com/build-guides).
 
-## Características
+## Features
 
-- 🎯 **Filtrado por tipo de build**: Feudal Rush, Fast Castle, Dark Age Rush, Water Maps
-- 📊 **Filtrado por dificultad**: Beginner, Intermediate, Advanced
-- 🔍 **Búsqueda de texto**: Busca builds por nombre o descripción
-- ⚡ **Cache inteligente**: Los builds se cargan una vez al inicio
-- 🚀 **API RESTful**: Endpoints bien documentados
+- 🎯 **Build type filtering**: Feudal Rush, Fast Castle, Dark Age Rush, Water Maps
+- 📊 **Difficulty filtering**: Beginner, Intermediate, Advanced
+- 🔍 **Text search**: Search builds by name or description
+- ⚡ **Smart caching**: Builds are loaded once at startup
+- 🚀 **RESTful API**: Well-documented endpoints
 
-## Instalación
+## Installation
 
-1. Clona el repositorio:
+1. Clone the repository:
 
 ```bash
 git clone https://github.com/SeelePifer/Aoe-guide-api.git
 cd Aoe-guide-api
 ```
 
-2. Instala las dependencias:
+2. Install dependencies:
 
 ```bash
 pip install -r requirements.txt
 ```
 
-3. Ejecuta la aplicación:
+3. Run the application:
 
 ```bash
 python main_optimized.py
 ```
 
-La API estará disponible en `http://localhost:8000`
+The API will be available at `http://localhost:8000`
 
-## Documentación
+## Documentation
 
-Una vez que la aplicación esté ejecutándose, puedes acceder a:
+Once the application is running, you can access:
 
 - **Swagger UI**: `http://localhost:8000/docs`
 - **ReDoc**: `http://localhost:8000/redoc`
 
-## Endpoints Disponibles
+## Available Endpoints
 
-### Obtener todos los builds
+### Get all builds
 
 ```
 GET /builds
 ```
 
-### Filtrar por tipo de build
+### Filter by build type
 
 ```
 GET /builds/{build_type}
 ```
 
-Tipos disponibles:
+Available types:
 
 - `feudal_rush`
 - `fast_castle`
 - `dark_age_rush`
 - `water_maps`
 
-### Filtrar por dificultad
+### Filter by difficulty
 
 ```
 GET /builds/difficulty/{difficulty}
 ```
 
-Dificultades disponibles:
+Available difficulties:
 
 - `beginner`
 - `intermediate`
 - `advanced`
 
-### Buscar builds
+### Search builds
 
 ```
 GET /builds/search?q={query}
 ```
 
-### Obtener tipos de builds
+### Get build types
 
 ```
 GET /builds/types
 ```
 
-### Obtener dificultades
+### Get difficulties
 
 ```
 GET /builds/difficulties
 ```
 
-### Refrescar cache
+### Refresh cache
 
 ```
 POST /builds/refresh
 ```
 
-## Ejemplos de Uso
+## Usage Examples
 
-### Obtener todos los builds de Feudal Rush
+### Get all Feudal Rush builds
 
 ```bash
 curl http://localhost:8000/builds/feudal_rush
 ```
 
-### Buscar builds de arqueros
+### Search for archer builds
 
 ```bash
 curl "http://localhost:8000/builds/search?q=archer"
 ```
 
-### Obtener builds para principiantes
+### Get builds for beginners
 
 ```bash
 curl http://localhost:8000/builds/difficulty/beginner
 ```
 
-## Estructura de Respuesta
+## Response Structure
 
 ```json
 {
@@ -137,18 +137,17 @@ curl http://localhost:8000/builds/difficulty/beginner
 }
 ```
 
-## Tecnologías Utilizadas
+## Technologies Used
 
-- **FastAPI**: Framework web moderno y rápido
+- **FastAPI**: Modern and fast web framework
 - **BeautifulSoup4**: Web scraping
-- **Requests**: Cliente HTTP
-- **Pydantic**: Validación de datos
-- **Uvicorn**: Servidor ASGI
+- **Requests**: HTTP client
+- **Pydantic**: Data validation
+- **Uvicorn**: ASGI server
 
-## Notas
+## Notes
 
-- La API hace web scraping de AoE Companion al iniciar
-- Los datos se cachean en memoria para mejor rendimiento
-- Usa el endpoint `/builds/refresh` para actualizar los datos
-- La API incluye CORS habilitado para uso en frontends
-
+- The API performs web scraping from AoE Companion on startup
+- Data is cached in memory for better performance
+- Use the `/builds/refresh` endpoint to update data
+- The API includes CORS enabled for frontend usage
