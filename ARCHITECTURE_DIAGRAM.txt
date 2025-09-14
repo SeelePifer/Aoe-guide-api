@@ -1,0 +1,108 @@
+# Diagrama de Arquitectura en Capas - AoE Build Guide API
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                        HTTP REQUEST                            │
+└─────────────────────┬───────────────────────────────────────────┘
+                      │
+                      ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                    CONTROLLER LAYER                            │
+│  ┌─────────────────┐  ┌─────────────────┐                     │
+│  │ BuildController │  │  AppController  │                     │
+│  │                 │  │                 │                     │
+│  │ • get_all_builds│  │ • root()        │                     │
+│  │ • get_by_type   │  │ • refresh()     │                     │
+│  │ • search        │  │                 │                     │
+│  │ • get_guide     │  │                 │                     │
+│  └─────────────────┘  └─────────────────┘                     │
+└─────────────────────┬───────────────────────────────────────────┘
+                      │
+                      ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                     SERVICE LAYER                              │
+│  ┌─────────────────┐  ┌─────────────────┐                     │
+│  │  BuildService   │  │ ScrapingService │                     │
+│  │                 │  │                 │                     │
+│  │ • get_all_builds│  │ • scrape_builds │                     │
+│  │ • get_by_type   │  │ • parse_html    │                     │
+│  │ • search        │  │ • extract_data  │                     │
+│  │ • get_guide     │  │                 │                     │
+│  │ • get_steps     │  │                 │                     │
+│  └─────────────────┘  └─────────────────┘                     │
+└─────────────────────┬───────────────────────────────────────────┘
+                      │
+                      ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                   REPOSITORY LAYER                             │
+│  ┌─────────────────────────────────────────────────────────────┐│
+│  │              BuildRepository                                ││
+│  │                                                             ││
+│  │ • get_all_builds()                                          ││
+│  │ • get_builds_by_type()                                      ││
+│  │ • get_builds_by_difficulty()                                ││
+│  │ • search_builds()                                           ││
+│  │ • update_cache()                                            ││
+│  └─────────────────────────────────────────────────────────────┘│
+└─────────────────────┬───────────────────────────────────────────┘
+                      │
+                      ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                    DATA LAYER                                  │
+│  ┌─────────────────────────────────────────────────────────────┐│
+│  │                    In-Memory Cache                          ││
+│  │                                                             ││
+│  │ • List[Build] - builds_cache                               ││
+│  │ • Scraped from AoE Companion                               ││
+│  │ • Updated on startup                                       ││
+│  └─────────────────────────────────────────────────────────────┘│
+└─────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────┐
+│                    DOMAIN LAYER                                │
+│  ┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐ │
+│  │      Build      │  │   BuildStep     │  │   BuildType     │ │
+│  │                 │  │                 │  │                 │ │
+│  │ • name          │  │ • step_number   │  │ • FEUDAL_RUSH   │ │
+│  │ • difficulty    │  │ • age           │  │ • FAST_CASTLE   │ │
+│  │ • description   │  │ • time          │  │ • DARK_AGE_RUSH │ │
+│  │ • build_type    │  │ • action        │  │ • WATER_MAPS    │ │
+│  │ • steps         │  │ • details       │  │                 │ │
+│  │ • age_times     │  │ • resources     │  │                 │ │
+│  └─────────────────┘  └─────────────────┘  └─────────────────┘ │
+└─────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────┐
+│                   CONFIG LAYER                                 │
+│  ┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐ │
+│  │    Settings     │  │   Database      │  │ Dependencies    │ │
+│  │                 │  │                 │  │                 │ │
+│  │ • app_name      │  │ • initialize()  │  │ • container     │ │
+│  │ • host/port     │  │ • refresh_data()│  │ • injection     │ │
+│  │ • cors_config   │  │ • get_cache()   │  │ • lifecycle     │ │
+│  │ • scraping_url  │  │                 │  │                 │ │
+│  └─────────────────┘  └─────────────────┘  └─────────────────┘ │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+## Flujo de Datos
+
+1. **HTTP Request** → Controller recibe la petición
+2. **Controller** → Valida y delega al Service
+3. **Service** → Aplica lógica de negocio y llama al Repository
+4. **Repository** → Accede a los datos (caché en memoria)
+5. **Data** → Retorna datos desde la caché
+6. **Repository** → Retorna datos al Service
+7. **Service** → Procesa y retorna al Controller
+8. **Controller** → Formatea respuesta HTTP
+9. **HTTP Response** → Cliente recibe la respuesta
+
+## Beneficios de esta Arquitectura
+
+✅ **Separación de Responsabilidades**: Cada capa tiene un propósito específico
+✅ **Testabilidad**: Fácil testing de cada capa independientemente
+✅ **Mantenibilidad**: Cambios en una capa no afectan otras
+✅ **Escalabilidad**: Fácil agregar nuevas funcionalidades
+✅ **Reutilización**: Servicios y repositorios reutilizables
+✅ **Flexibilidad**: Fácil cambiar implementaciones
+
