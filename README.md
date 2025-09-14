@@ -15,7 +15,7 @@ Una API REST construida con FastAPI que consume información de builds de Age of
 1. Clona el repositorio:
 
 ```bash
-git clone <tu-repositorio>
+git clone https://github.com/SeelePifer/Aoe-guide-api.git
 cd Aoe-guide-api
 ```
 
@@ -28,7 +28,7 @@ pip install -r requirements.txt
 3. Ejecuta la aplicación:
 
 ```bash
-python main.py
+python main_optimized.py
 ```
 
 La API estará disponible en `http://localhost:8000`
