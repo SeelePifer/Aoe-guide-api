@@ -1,4 +1,4 @@
-# Layered Architecture - AoE Build Guide API (Optimized)
+**# Layered Architecture - AoE Build Guide API (Optimized)
 
 ## 📁 Project Structure
 
@@ -139,7 +139,7 @@ Aoe-guide-api/
 - **Purpose**: Helper functions
 - **Files**: `app/utils/helpers.py`
 
-## 🔄 Flujo de Datos Optimizado
+## 🔄 Optimized Data Flow
 
 ```
 HTTP Request → Middleware → Controller → Service → Repository → Cache → Data Source
@@ -147,97 +147,47 @@ HTTP Request → Middleware → Controller → Service → Repository → Cache 
 HTTP Response ← Middleware ← Controller ← Service ← Repository ← Cache ← Data Source
 ```
 
-### **Flujo Detallado con Optimizaciones**
+## 🚀 Performance Improvements
 
-1. **Request** llega al middleware de rendimiento
-2. **Middleware** aplica compresión y headers de cache
-3. **Controller** valida parámetros y aplica dependency injection
-4. **Service** ejecuta lógica de negocio con métricas
-5. **Repository** consulta cache primero, luego datos
-6. **Cache** devuelve datos si están disponibles
-7. **Response** se comprime y se agregan headers de rendimiento
+- **Persistent Cache** with SQLite + TTL
+- **Intelligent Pagination** (default 10, max 100)
+- **Async Scraping** with aiohttp + rate limiting
+- **Response Compression** (gzip >1KB)
+- **Performance Middleware** with metrics & logging
 
-## 🚀 Mejoras de Rendimiento Implementadas
+## 📊 Performance Metrics
 
-### **1. Sistema de Cache Persistente**
+### Before
+- Response time: **200-500ms**
+- Response size: **50-200KB**
+- Cache hit rate: **0%**
+- Scraping: **10-15s** (blocking)
+- Memory: **100-200MB**
 
-- **SQLite Cache**: Persistencia entre reinicios
-- **TTL Configurable**: Tiempo de vida por tipo de datos
-- **Índices Optimizados**: Búsquedas O(1)
-- **Estadísticas**: Monitoreo de hit/miss rates
+### After
+- Response time: **20-50ms** (cache hit)
+- Response size: **5-20KB** (compressed)
+- Cache hit rate: **85-95%**
+- Scraping: **3-5s** (async)
+- Memory: **50-100MB**
 
-### **2. Paginación Inteligente**
+---
 
-- **Paginación por defecto**: 10 items, máximo 100
-- **Filtros combinables**: Tipo, dificultad, búsqueda, ordenamiento
-- **Metadatos completos**: Navegación y estadísticas
-- **Respuestas optimizadas**: Solo datos necesarios
+## 🔧 How to use
 
-### **3. Scraping Asíncrono**
-
-- **aiohttp**: Requests no bloqueantes
-- **Procesamiento paralelo**: Múltiples requests simultáneos
-- **Rate limiting**: Control de concurrencia
-- **Timeout configurable**: Evita requests colgados
-
-### **4. Compresión de Respuestas**
-
-- **Gzip automático**: Para respuestas >1KB
-- **Headers optimizados**: Content-Encoding correcto
-- **Detección inteligente**: Solo tipos apropiados
-
-### **5. Middleware de Rendimiento**
-
-- **Métricas en tiempo real**: Tiempo de procesamiento
-- **Headers de cache**: Cache-Control y ETag
-- **Logging estructurado**: Para debugging
-- **304 Not Modified**: Respuestas optimizadas
-
-## 📊 Métricas de Rendimiento
-
-### **Antes de Optimizaciones**
-
-```
-- Tiempo de respuesta: 200-500ms
-- Tamaño de respuesta: 50-200KB
-- Cache hit rate: 0%
-- Scraping inicial: 10-15s (bloqueante)
-- Memoria: 100-200MB
-```
-
-### **Después de Optimizaciones**
-
-```
-- Tiempo de respuesta: 20-50ms (cache hit)
-- Tamaño de respuesta: 5-20KB (comprimido)
-- Cache hit rate: 85-95%
-- Scraping inicial: 3-5s (asíncrono)
-- Memoria: 50-100MB (optimizada)
-```
-
-### **Mejoras Cuantificadas**
-
-- ⚡ **90% reducción** en tiempo de respuesta
-- 📦 **80% reducción** en tamaño de respuestas
-- 🚀 **3x más rápido** en scraping
-- 💾 **50% menos memoria** utilizada
-- 🎯 **95% cache hit rate**
-
-## 🔧 Cómo Usar
-
-### **Versión Original (Legacy)**
+### **Original version (Legacy)**
 
 ```bash
 python main.py
 ```
 
-### **Versión Refactorizada**
+### **Refactored version**
 
 ```bash
 python main_refactored.py
 ```
 
-### **Versión Optimizada (Recomendada)**
+### **Optimized Version (Recommend)**
 
 ```bash
 # Instalar dependencias adicionales
@@ -247,7 +197,7 @@ pip install -r requirements.txt
 python main_optimized.py
 ```
 
-### **Testing de Rendimiento**
+### **Performance Testing**
 
 ```bash
 # Tests unitarios
@@ -263,85 +213,83 @@ python test_performance.py
 python run_tests.py
 ```
 
-## 🎯 Endpoints Optimizados
+## 🎯 Optimized Endpoints
 
-### **Endpoints Básicos**
+### **Basic Endpoints**
 
-- `GET /` - Información de la API con estadísticas
-- `GET /health` - Health check con estado de servicios
-- `GET /cache/stats` - Estadísticas del cache
+- `GET /` - Basic welcome message
+- `GET /health` - Health check
+- `GET /cache/stats` - Cache statistics
 
-### **Endpoints de Builds con Paginación**
+### **Endpoints with pagination*
 
-- `GET /builds` - Todos los builds (paginado)
-- `GET /builds/{build_type}` - Builds por tipo (paginado)
-- `GET /builds/difficulty/{difficulty}` - Builds por dificultad (paginado)
-- `GET /builds/search` - Búsqueda de builds (paginado)
-- `GET /builds/filter` - Filtros múltiples (paginado)
+- `GET /builds` - All builds (paginated)
+- `GET /builds/{build_type}` - Builds by type (paginated)
+  - Available types: `feudal_rush`, `fast_castle`, `dark_age_rush`, `water_maps`
+- `GET /builds/difficulty/{difficulty}` - Builds by difficulty (paginated)
+  - Available difficulties: `beginner`, `intermediate`, `advanced`
+- `GET /builds/search` - Search builds (paginated)
+- `GET /builds/filter` - Filter builds by type/difficulty (paginated)
+### **Utilities Endpoints**
 
-### **Endpoints de Utilidades**
-
-- `GET /builds/types` - Tipos disponibles
-- `GET /builds/difficulties` - Dificultades disponibles
-- `POST /builds/refresh` - Refrescar cache
+- `GET /builds/types` - Available build types
+- `GET /builds/difficulties` - Available difficulties
+- `POST /builds/refresh` - Refresh build data (async)
 
 ### **Parámetros de Paginación**
 
 ```bash
-# Sintaxis básica
+
 curl "http://localhost:8000/builds?page=1&size=10"
 
-# Con filtros
+
 curl "http://localhost:8000/builds/filter?build_type=feudal_rush&page=1&size=5"
 
-# Con búsqueda
+
 curl "http://localhost:8000/builds/search?q=rush&page=1&size=10"
 ```
 
-## 🛠️ Configuración Avanzada
+## 🛠️ Advanced config
 
 ### **Cache Configuration**
 
 ```python
-# En app/config/cache.py
 cache_manager = CacheManager(
-    db_path="cache.db",      # Ruta del archivo de cache
-    ttl_seconds=3600         # TTL por defecto
+    db_path="cache.db",     
+    ttl_seconds=3600        
 )
 ```
 
 ### **Scraping Configuration**
 
 ```python
-# En app/services/scraping_service.py
 scraping_service = OptimizedScrapingService(
-    max_concurrent_requests=5,  # Máximo requests simultáneos
-    timeout=30                  # Timeout en segundos
+    max_concurrent_requests=5,  
+    timeout=30                 
 )
 ```
 
 ### **Middleware Configuration**
 
 ```python
-# En main_optimized.py
 app.add_middleware(PerformanceMiddleware)
 app.add_middleware(CacheHeadersMiddleware, cache_ttl=3600)
 app.add_middleware(RequestLoggingMiddleware)
 app.add_middleware(GZipMiddleware, minimum_size=1000)
 ```
 
-## 📈 Monitoreo y Observabilidad
+## 📈 Observability
 
-### **Headers de Respuesta**
+### **Response headers**
 
 ```
-X-Process-Time: 25.5          # Tiempo de procesamiento en ms
-X-Cache-Status: HIT           # Estado del cache
-Content-Encoding: gzip        # Compresión aplicada
-Cache-Control: public, max-age=3600  # Cache del cliente
+X-Process-Time: 25.5          # Time taken to process
+X-Cache-Status: HIT           # Status of the cache
+Content-Encoding: gzip        # Response compression
+Cache-Control: public, max-age=3600  # Cache directives
 ```
 
-### **Logs Estructurados**
+### **Logs**
 
 ```
 2024-01-15 10:30:15 - INFO - Request: GET /builds
@@ -349,7 +297,7 @@ Cache-Control: public, max-age=3600  # Cache del cliente
 2024-01-15 10:30:15 - DEBUG - Cache HIT: get_all_builds
 ```
 
-### **Estadísticas de Cache**
+### **Statistics from Cache**
 
 ```json
 {
@@ -360,66 +308,71 @@ Cache-Control: public, max-age=3600  # Cache del cliente
 }
 ```
 
-## 🚀 Ventajas de la Arquitectura Optimizada
+## 🚀 Advantages of the Optimized Architecture
 
-### ✅ **Rendimiento Superior**
+### ✅ **Superior Performance**
 
-- 90% reducción en tiempo de respuesta
-- 80% reducción en tamaño de respuestas
-- 3x más rápido en scraping
-- 95% cache hit rate
+- 90% reduction in response time  
+- 80% reduction in response size  
+- 3x faster scraping  
+- 95% cache hit rate  
 
-### ✅ **Escalabilidad Mejorada**
+### ✅ **Improved Scalability**
 
-- Paginación nativa en todos los endpoints
-- Cache persistente entre reinicios
-- Procesamiento asíncrono no bloqueante
-- Índices optimizados para búsquedas
+- Native pagination on all endpoints  
+- Persistent cache across restarts  
+- Non-blocking asynchronous processing  
+- Optimized indexes for searches  
 
-### ✅ **Mantenibilidad Avanzada**
+### ✅ **Advanced Maintainability**
 
-- Logging estructurado para debugging
-- Métricas de rendimiento en tiempo real
-- Configuración flexible por ambiente
-- Testing comprehensivo
+- Structured logging for debugging  
+- Real-time performance metrics  
+- Flexible environment-based configuration  
+- Comprehensive testing  
 
-### ✅ **Observabilidad Completa**
+### ✅ **Complete Observability**
 
-- Headers de rendimiento automáticos
-- Estadísticas de cache detalladas
-- Health checks con estado de servicios
-- Tests de rendimiento automatizados
-
-## 📝 Próximos Pasos
-
-### **Corto Plazo (1-2 semanas)**
-
-- [ ] **Redis Cache**: Migrar de SQLite a Redis
-- [ ] **Rate Limiting**: Implementar límites por IP
-- [ ] **Métricas Prometheus**: Integración con monitoreo
-
-### **Mediano Plazo (1 mes)**
-
-- [ ] **Base de Datos Real**: Migrar a PostgreSQL/MySQL
-- [ ] **CDN Integration**: Cache distribuido
-- [ ] **Load Balancing**: Distribución de carga
-
-### **Largo Plazo (2-3 meses)**
-
-- [ ] **Microservicios**: Separar scraping, API y cache
-- [ ] **Kubernetes**: Orquestación de contenedores
-- [ ] **Machine Learning**: Predicción de builds populares
-
-## 🎯 Beneficios Inmediatos
-
-- **🚀 Rendimiento 3-5x superior**
-- **📊 Observabilidad completa**
-- **🔧 Configuración flexible**
-- **🧪 Testing automatizado**
-- **📈 Escalabilidad mejorada**
-- **🛡️ Robustez ante fallos**
-- **💾 Eficiencia de recursos**
+- Automatic performance headers  
+- Detailed cache statistics  
+- Health checks with service status  
+- Automated performance tests  
 
 ---
 
-¡La arquitectura optimizada proporciona una base sólida, escalable y de alto rendimiento para tu API! 🚀
+## 📝 Next Steps
+
+### **Short Term (1-2 weeks)**
+
+- [ ] **Redis Cache**: Migrate from SQLite to Redis  
+- [ ] **Rate Limiting**: Implement per-IP limits  
+- [ ] **Prometheus Metrics**: Monitoring integration  
+
+### **Mid Term (1 month)**
+
+- [ ] **Real Database**: Migrate to PostgreSQL/MySQL  
+- [ ] **CDN Integration**: Distributed caching  
+- [ ] **Load Balancing**: Traffic distribution  
+
+### **Long Term (2-3 months)**
+
+- [ ] **Microservices**: Separate scraping, API, and cache  
+- [ ] **Kubernetes**: Container orchestration  
+- [ ] **Machine Learning**: Predict popular builds  
+
+---
+
+## 🎯 Immediate Benefits
+
+- **🚀 3-5x faster performance**  
+- **📊 Full observability**  
+- **🔧 Flexible configuration**  
+- **🧪 Automated testing**  
+- **📈 Improved scalability**  
+- **🛡️ Fault tolerance**  
+- **💾 Resource efficiency**  
+
+---
+
+The optimized architecture provides a **solid, scalable, and high-performance foundation** for your API! 🚀
+
